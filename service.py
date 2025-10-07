@@ -45,13 +45,14 @@ class ImageEditService(_BaseService):
         final_prompt = f"{lang_guard}{base_prompt}, {quality_tags}"
 
         neg_suffix = (
-            ", 过饱和, 过度对比, oversaturated colors, excessive contrast, "
+            "过饱和, 过度对比, oversaturated colors, excessive contrast, "
             "posterized, flat colors, flat shading, strong outlines, black outlines, "
             "thick outlines, ink outlines, unnatural colors, filter,low detail, low quality, "
             "jpeg artifacts, ugly, noise, noise pattern, smudged, blurry, misspelled text, "
             "extra text, warped text, deformed letters, messy typography, wrong spelling"
         )
-        final_negative = (r.get("negative_prompt", "").strip() + neg_suffix).strip(", ")
+        user_neg_prompt = r.get("negative_prompt", "").strip()
+        final_negative = f"{user_neg_prompt}, {neg_suffix}" if user_neg_prompt else neg_suffix
         return {
             "image": r["image"],
             "prompt": final_prompt,
