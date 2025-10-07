@@ -35,12 +35,30 @@ class ImageEditService(_BaseService):
 
     def _prepare_request(self, r: dict) -> dict:
         seed = r.get("seed", 42)
+
+        base_prompt = r["prompt"]
+        lang_guard = (
+            "请严格按照以下描述生成图像，保持中文与英文原样，不要翻译任何部分 / "
+            "Please generate strictly according to the description below without translating any part: "
+        )
+        quality_tags = "masterpiece, best quality, ultra-detailed, natural"
+        final_prompt = f"{lang_guard}{base_prompt}, {quality_tags}"
+
+        neg_suffix = (
+            "过饱和, 过度对比, oversaturated colors, excessive contrast, "
+            "posterized, flat colors, flat shading, strong outlines, black outlines, "
+            "thick outlines, ink outlines, unnatural colors, filter,low detail, low quality, "
+            "jpeg artifacts, ugly, noise, noise pattern, smudged, blurry, misspelled text, "
+            "extra text, warped text, deformed letters, messy typography, wrong spelling"
+        )
+        user_neg_prompt = r.get("negative_prompt", "").strip()
+        final_negative = f"{user_neg_prompt}, {neg_suffix}" if user_neg_prompt else neg_suffix
         return {
             "image": r["image"],
-            "prompt": r["prompt"],
-            "negative_prompt": r.get("negative_prompt", " "),
-            "num_inference_steps": r.get("num_inference_steps", 40),
-            "true_cfg_scale": r.get("true_cfg_scale", 4.0),
+            "prompt": final_prompt,
+            "negative_prompt": final_negative,
+            "num_inference_steps": r.get("num_inference_steps", 35),
+            "true_cfg_scale": r.get("true_cfg_scale", 6.0),
             "generator": torch.Generator(device=self.device).manual_seed(seed),
         }
 
