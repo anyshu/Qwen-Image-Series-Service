@@ -2,7 +2,21 @@ import os
 
 import torch
 from diffusers import QwenImageEditPipeline, QwenImagePipeline
+from diffusers import QwenImageEditPlusPipeline
 from PIL import Image
+
+
+def _resolve_model_location(env_var: str, default: str) -> str:
+    """Return a local model directory or pass-through HF repo id."""
+    location = os.getenv(env_var, default)
+    if os.path.isdir(location):
+        return location
+    if os.path.isabs(location):
+        raise FileNotFoundError(
+            f"Model path '{location}' not found. "
+            f"Update {env_var} or mount the directory inside the container."
+        )
+    return location
 
 
 class _BaseService:
@@ -24,8 +38,9 @@ class ImageEditService(_BaseService):
     """专门用于图像编辑的模型服务：Qwen-Image-Edit"""
 
     def __init__(self) -> None:
+        model_location = _resolve_model_location("QWEN_IMAGE_EDIT_LOCATION", "/qwen-image-edit")
         self.pipeline = QwenImageEditPipeline.from_pretrained(
-            os.getenv("QWEN_IMAGE_EDIT_LOCATION", "/qwen-image-edit"),
+            model_location,
             torch_dtype=torch.bfloat16,
         )
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -68,8 +83,9 @@ class ImageGenerationService(_BaseService):
     """专门用于图像生成的模型服务：Qwen-Image"""
 
     def __init__(self) -> None:
-        self.pipeline = QwenImagePipeline.from_pretrained(
-            os.getenv("QWEN_IMAGE_LOCATION", "/qwen-image"), torch_dtype=torch.bfloat16
+        model_location = _resolve_model_location("QWEN_IMAGE_LOCATION", "/qwen-image")
+        self.pipeline = QwenImageEditPlusPipeline.from_pretrained(
+            model_location, torch_dtype=torch.bfloat16
         )
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.pipeline.to(self.device)

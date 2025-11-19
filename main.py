@@ -52,7 +52,7 @@ def edit_form_body(
     )
 
 
-edit_service = ImageEditService()
+# edit_service = ImageEditService()
 generation_service = ImageGenerationService()
 
 
