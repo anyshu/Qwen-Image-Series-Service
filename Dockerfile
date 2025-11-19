@@ -1,5 +1,5 @@
 # 使用体积小一点的pytorch镜像
-FROM registry.cn-hangzhou.aliyuncs.com/anyshu/pytorch/pytorch:2.9.1-cuda12.8-cudnn9-runtime
+FROM registry.cn-hangzhou.aliyuncs.com/anyshu/pytorch:2.9.1-cuda12.8-cudnn9-runtime
 
 # 设置工作目录
 WORKDIR /app
@@ -13,12 +13,13 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 安装系统依赖
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:/root/.cargo/bin:${PATH}"
 
 # 复制项目配置文件
 COPY pyproject.toml uv.lock* ./
 
 # 安装Python依赖
-RUN /root/.local/bin/uv sync --no-dev
+RUN uv sync --no-dev
 
 # 复制应用代码
 COPY main.py service.py ./
