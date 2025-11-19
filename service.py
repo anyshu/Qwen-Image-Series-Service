@@ -3,7 +3,6 @@ import os
 import torch
 from diffusers import QwenImageEditPipeline, QwenImagePipeline
 from PIL import Image
-from ray import serve
 
 
 class _BaseService:
@@ -21,7 +20,6 @@ class _BaseService:
             return model_output.images[0]
 
 
-@serve.deployment(ray_actor_options={"num_gpus": 1 if torch.cuda.is_available() else 0})
 class ImageEditService(_BaseService):
     """专门用于图像编辑的模型服务：Qwen-Image-Edit"""
 
@@ -66,7 +64,6 @@ class ImageEditService(_BaseService):
         return await self._process_single(request)
 
 
-@serve.deployment(ray_actor_options={"num_gpus": 1 if torch.cuda.is_available() else 0})
 class ImageGenerationService(_BaseService):
     """专门用于图像生成的模型服务：Qwen-Image"""
 
