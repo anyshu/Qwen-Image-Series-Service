@@ -8,7 +8,9 @@ services:
     ports:
       - "18808:8000"
     volumes:
-      - /mnt/data/models/Qwen:/mnt/data/models/Qwen
+      - /mnt/data/models/Qwen:/Qwen/models
+    environment:
+      - QWEN_IMAGE_EDIT_LOCATION=/Qwen/models/qwen-image-edit-2509
     deploy:
       resources:
         reservations:

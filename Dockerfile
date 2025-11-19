@@ -1,5 +1,5 @@
 # 使用体积小一点的pytorch镜像
-FROM pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime
+FROM registry.cn-hangzhou.aliyuncs.com/anyshu/pytorch/pytorch:2.9.1-cuda12.8-cudnn9-runtime
 
 # 设置工作目录
 WORKDIR /app
