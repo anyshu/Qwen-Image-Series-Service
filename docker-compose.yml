@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  qwen-image-series-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "18808:8000"
+    volumes:
+      - /mnt/data/models/Qwen:/mnt/data/models/Qwen
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 2
+              capabilities: ["gpu"]
